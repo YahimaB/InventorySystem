@@ -36,7 +36,6 @@ namespace UI
 
                 foreach (RaycastResult result in results)
                 {
-                    Debug.Log("Hit " + result.gameObject.name);
                     InventorySlot slot = result.gameObject.GetComponent<InventorySlot>();
                     if (slot)
                     {

@@ -74,6 +74,7 @@ namespace InventorySystem
 
             UnityWebRequest www = UnityWebRequest.Post("https://dev3r02.elysium.today/inventory/status", form);
             www.SetRequestHeader("Authorization", "BMeHG5xqJeB4qCjpuJCTQLsqNGaqkfB6");
+            www.timeout = 2; //introduced after server crash on 21 Sep
             yield return www.SendWebRequest();
 
             if (www.isNetworkError || www.isHttpError)

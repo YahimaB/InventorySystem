@@ -41,8 +41,7 @@ namespace InventorySystem
 
         public void ConnectToHandle(GameObject handle)
         {
-            Debug.Log(connectionPoint.localPosition);
-            Debug.Log(handle.transform.position);
+            IsUsed = true;
             StartCoroutine(MoveItem(handle.transform.rotation, handle.transform.position, () =>
             {
                 var joint = gameObject.AddComponent<FixedJoint>();
@@ -56,6 +55,7 @@ namespace InventorySystem
             Destroy(GetComponent<FixedJoint>());
 
             StartCoroutine(MoveItem(transform.rotation, endPosition));
+            IsUsed = false;
         }
 
         private IEnumerator MoveItem(Quaternion endRotation, Vector3 endPosition, Action onCompleted = null)
@@ -72,7 +72,6 @@ namespace InventorySystem
             onCompleted?.Invoke();
             GetComponent<Collider>().isTrigger = false;
             rigidbody.isKinematic = false;
-
         }
 
         private Vector3 GetMouseAsWorldPoint()
@@ -84,7 +83,7 @@ namespace InventorySystem
 
         private void OnMouseDown()
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
+            if (!EventSystem.current.IsPointerOverGameObject() && !IsUsed)
             {
                 mouseZCoord = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
                 mOffset = gameObject.transform.position - GetMouseAsWorldPoint();
@@ -95,7 +94,10 @@ namespace InventorySystem
 
         private void OnMouseDrag()
         {
-            transform.position = GetMouseAsWorldPoint() + mOffset;
+            if (!EventSystem.current.IsPointerOverGameObject() && !IsUsed)
+            {
+                transform.position = GetMouseAsWorldPoint() + mOffset;
+            }
         }
 
         private void OnMouseUp()
@@ -116,9 +118,8 @@ namespace InventorySystem
 
         private void LockObject(bool isLocked)
         {
-            IsUsed = isLocked;
             GetComponent<Collider>().isTrigger = isLocked;
-            rigidbody.useGravity = !IsUsed;
+            rigidbody.useGravity = !isLocked;
             rigidbody.velocity = Vector3.zero;
             rigidbody.angularVelocity = Vector3.zero;
         }
